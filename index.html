@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SportMatch - Conecta y Juega</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Variables de colores y estilos */
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #388E3C;
+            --secondary: #2196F3;
+            --accent: #FF5722;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --card-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
+        /* Reset y estilos base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            background-color: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 8px;
+        }
+
+        .user-actions a {
+            color: white;
+            margin-left: 15px;
+            font-size: 1.2rem;
+        }
+
+        /* Barra de búsqueda */
+        .search-bar {
+            background-color: white;
+            border-radius: 50px;
+            padding: 8px 15px;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            box-shadow: var(--card-shadow);
+        }
+
+        .search-bar input {
+            border: none;
+            outline: none;
+            flex: 1;
+            padding: 8px;
+            font-size: 0.9rem;
+        }
+
+        .search-bar i {
+            color: var(--gray);
+        }
+
+        /* Navegación */
+        .nav-tabs {
+            display: flex;
+            background-color: white;
+            border-bottom: 1px solid #eee;
+            overflow-x: auto;
+            padding: 0 15px;
+            position: sticky;
+            top: 120px;
+            z-index: 90;
+        }
+
+        .nav-tab {
+            padding: 15px 20px;
+            white-space: nowrap;
+            font-weight: 500;
+            color: var(--gray);
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+        }
+
+        .nav-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* Contenido principal */
+        .main-content {
+            padding: 15px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title a {
+            color: var(--secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Tarjetas */
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 15px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-body {
+            padding: 15px;
+        }
+
+        .card-footer {
+            padding: 10px 15px;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Partidos activos */
+        .match-card {
+            position: relative;
+        }
+
+        .match-sport {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: var(--primary);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .match-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .match-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .match-details h3 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .match-details p {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .players-needed {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .players-needed span {
+            background-color: var(--light);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-right: 10px;
+        }
+
+        .action-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .action-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* Perfiles de jugadores */
+        .player-card {
+            text-align: center;
+            padding: 15px;
+        }
+
+        .player-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--gray);
+        }
+
+        .player-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .player-sport {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .player-rating {
+            color: #FFC107;
+            margin-bottom: 10px;
+        }
+
+        /* Clubes */
+        .club-card {
+            display: flex;
+            align-items: center;
+        }
+
+        .club-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--secondary);
+            font-size: 1.5rem;
+        }
+
+        .club-info h3 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .club-info p {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        /* Información y reglas */
+        .info-section {
+            margin-bottom: 30px;
+        }
+
+        .step-card {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background-color: var(--secondary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: 600;
+        }
+
+        .step-content h3 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .step-content p {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        /* Sistema de ranking */
+        .ranking-card {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .ranking-position {
+            width: 30px;
+            height: 30px;
+            background-color: var(--light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: 600;
+        }
+
+        .ranking-position.top {
+            background-color: #FFC107;
+            color: white;
+        }
+
+        .ranking-info {
+            flex: 1;
+        }
+
+        .ranking-info h3 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .ranking-info p {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .ranking-points {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* Navegación inferior */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--gray);
+            font-size: 0.8rem;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            margin-bottom: 3px;
+        }
+
+        /* Espacio para la navegación inferior */
+        .content-spacer {
+            height: 70px;
+        }
+
+        /* Responsividad adicional */
+        @media (max-width: 480px) {
+            .app-container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-running"></i>
+                    SportMatch
+                </div>
+                <div class="user-actions">
+                    <a href="#"><i class="fas fa-bell"></i></a>
+                    <a href="#"><i class="fas fa-user-circle"></i></a>
+                </div>
+            </div>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Buscar jugadores, partidos, clubes...">
+            </div>
+        </header>
+
+        <!-- Navegación por pestañas -->
+        <nav class="nav-tabs">
+            <div class="nav-tab active">Partidos</div>
+            <div class="nav-tab">Jugadores</div>
+            <div class="nav-tab">Clubes</div>
+            <div class="nav-tab">Información</div>
+            <div class="nav-tab">Ranking</div>
+        </nav>
+
+        <!-- Contenido principal -->
+        <main class="main-content">
+            <!-- Sección de partidos activos -->
+            <section id="matches">
+                <div class="section-title">
+                    <h2>Partidos Activos</h2>
+                    <a href="#">Ver todos</a>
+                </div>
+
+                <!-- Tarjeta de partido 1 -->
+                <div class="card match-card">
+                    <div class="card-header">
+                        <div class="match-info">
+                            <div class="match-icon">
+                                <i class="fas fa-table-tennis"></i>
+                            </div>
+                            <div class="match-details">
+                                <h3>Pádel - Nivel Intermedio</h3>
+                                <p>Club Deportivo Central • Hoy, 18:30</p>
+                            </div>
+                        </div>
+                        <div class="match-sport">Pádel</div>
+                    </div>
+                    <div class="card-body">
+                        <p>Se necesitan 2 jugadores para completar el partido. Cancha de cristal.</p>
+                        <div class="players-needed">
+                            <span><i class="fas fa-users"></i> 2/4 jugadores</span>
+                            <span><i class="fas fa-map-marker-alt"></i> 1.2 km</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="action-btn">Unirse</button>
+                        <div>
+                            <i class="far fa-heart"></i>
+                            <i class="far fa-share-square"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta de partido 2 -->
+                <div class="card match-card">
+                    <div class="card-header">
+                        <div class="match-info">
+                            <div class="match-icon">
+                                <i class="fas fa-futbol"></i>
+                            </div>
+                            <div class="match-details">
+                                <h3>Fútbol 7 - Amistoso</h3>
+                                <p>Polideportivo Municipal • Mañana, 20:00</p>
+                            </div>
+                        </div>
+                        <div class="match-sport">Fútbol</div>
+                    </div>
+                    <div class="card-body">
+                        <p>Partido amistoso, todos los niveles son bienvenidos.</p>
+                        <div class="players-needed">
+                            <span><i class="fas fa-users"></i> 5/14 jugadores</span>
+                            <span><i class="fas fa-map-marker-alt"></i> 2.5 km</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="action-btn">Unirse</button>
+                        <div>
+                            <i class="far fa-heart"></i>
+                            <i class="far fa-share-square"></i>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección de jugadores destacados -->
+            <section id="players" style="margin-top: 30px;">
+                <div class="section-title">
+                    <h2>Jugadores Destacados</h2>
+                    <a href="#">Ver todos</a>
+                </div>
+
+                <div style="display: flex; overflow-x: auto; padding-bottom: 10px;">
+                    <!-- Jugador 1 -->
+                    <div class="card player-card" style="min-width: 150px; margin-right: 15px;">
+                        <div class="player-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="player-name">María López</div>
+                        <div class="player-sport">Tenis</div>
+                        <div class="player-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                        </div>
+                        <button class="action-btn" style="padding: 5px 10px; font-size: 0.8rem;">Seguir</button>
+                    </div>
+
+                    <!-- Jugador 2 -->
+                    <div class="card player-card" style="min-width: 150px; margin-right: 15px;">
+                        <div class="player-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="player-name">Carlos Ruiz</div>
+                        <div class="player-sport">Pádel</div>
+                        <div class="player-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <button class="action-btn" style="padding: 5px 10px; font-size: 0.8rem;">Seguir</button>
+                    </div>
+
+                    <!-- Jugador 3 -->
+                    <div class="card player-card" style="min-width: 150px; margin-right: 15px;">
+                        <div class="player-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="player-name">Ana Martínez</div>
+                        <div class="player-sport">Fútbol</div>
+                        <div class="player-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <button class="action-btn" style="padding: 5px 10px; font-size: 0.8rem;">Seguir</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección de clubes -->
+            <section id="clubs" style="margin-top: 30px;">
+                <div class="section-title">
+                    <h2>Clubes Destacados</h2>
+                    <a href="#">Ver todos</a>
+                </div>
+
+                <!-- Club 1 -->
+                <div class="card club-card">
+                    <div class="club-logo">
+                        <i class="fas fa-landmark"></i>
+                    </div>
+                    <div class="club-info">
+                        <h3>Club Deportivo Central</h3>
+                        <p>Instalaciones premium para pádel, tenis y natación</p>
+                        <div style="margin-top: 10px;">
+                            <span style="background-color: var(--light); padding: 3px 8px; border-radius: 10px; font-size: 0.8rem; margin-right: 5px;">
+                                <i class="fas fa-map-marker-alt"></i> 2.1 km
+                            </span>
+                            <span style="background-color: var(--light); padding: 3px 8px; border-radius: 10px; font-size: 0.8rem;">
+                                <i class="fas fa-users"></i> 245 miembros
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Club 2 -->
+                <div class="card club-card">
+                    <div class="club-logo">
+                        <i class="fas fa-tree"></i>
+                    </div>
+                    <div class="club-info">
+                        <h3>Polideportivo Municipal</h3>
+                        <p>Instalaciones públicas para múltiples deportes</p>
+                        <div style="margin-top: 10px;">
+                            <span style="background-color: var(--light); padding: 3px 8px; border-radius: 10px; font-size: 0.8rem; margin-right: 5px;">
+                                <i class="fas fa-map-marker-alt"></i> 3.5 km
+                            </span>
+                            <span style="background-color: var(--light); padding: 3px 8px; border-radius: 10px; font-size: 0.8rem;">
+                                <i class="fas fa-users"></i> 189 miembros
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección de información -->
+            <section id="info" style="margin-top: 30px;">
+                <div class="section-title">
+                    <h2>Cómo Armar Partidos</h2>
+                </div>
+
+                <div class="info-section">
+                    <!-- Paso 1 -->
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Selecciona el deporte</h3>
+                            <p>Elige entre pádel, tenis, fútbol u otros deportes disponibles.</p>
+                        </div>
+                    </div>
+
+                    <!-- Paso 2 -->
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Configura los detalles</h3>
+                            <p>Establece fecha, hora, ubicación, nivel de juego y número de jugadores.</p>
+                        </div>
+                    </div>
+
+                    <!-- Paso 3 -->
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Invita jugadores</h3>
+                            <p>Comparte tu partido y deja que otros se unan, o invita a jugadores específicos.</p>
+                        </div>
+                    </div>
+
+                    <!-- Paso 4 -->
+                    <div class="step-card">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>¡A jugar!</h3>
+                            <p>Una vez completado el cupo, confirma el partido y disfruta del juego.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title" style="margin-top: 30px;">
+                    <h2>Reglas Básicas</h2>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <ul style="padding-left: 20px;">
+                            <li style="margin-bottom: 10px;">Respeta a todos los jugadores independientemente de su nivel.</li>
+                            <li style="margin-bottom: 10px;">Confirma tu asistencia con al menos 2 horas de anticipación.</li>
+                            <li style="margin-bottom: 10px;">En caso de cancelación, notifica con la mayor antelación posible.</li>
+                            <li style="margin-bottom: 10px;">Divide los costos de manera equitativa entre los participantes.</li>
+                            <li>Mantén un ambiente deportivo y de camaradería en todo momento.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección de ranking -->
+            <section id="ranking" style="margin-top: 30px;">
+                <div class="section-title">
+                    <h2>Ranking de Jugadores</h2>
+                    <a href="#">Ver ranking completo</a>
+                </div>
+
+                <!-- Jugador 1 en ranking -->
+                <div class="card ranking-card">
+                    <div class="ranking-position top">1</div>
+                    <div class="ranking-info">
+                        <h3>Carlos Ruiz</h3>
+                        <p>Pádel • Nivel Avanzado</p>
+                    </div>
+                    <div class="ranking-points">1,250 pts</div>
+                </div>
+
+                <!-- Jugador 2 en ranking -->
+                <div class="card ranking-card">
+                    <div class="ranking-position top">2</div>
+                    <div class="ranking-info">
+                        <h3>Ana Martínez</h3>
+                        <p>Fútbol • Nivel Avanzado</p>
+                    </div>
+                    <div class="ranking-points">1,180 pts</div>
+                </div>
+
+                <!-- Jugador 3 en ranking -->
+                <div class="card ranking-card">
+                    <div class="ranking-position top">3</div>
+                    <div class="ranking-info">
+                        <h3>María López</h3>
+                        <p>Tenis • Nivel Intermedio-Avanzado</p>
+                    </div>
+                    <div class="ranking-points">1,120 pts</div>
+                </div>
+
+                <!-- Jugador 4 en ranking -->
+                <div class="card ranking-card">
+                    <div class="ranking-position">4</div>
+                    <div class="ranking-info">
+                        <h3>Javier Gómez</h3>
+                        <p>Pádel • Nivel Intermedio</p>
+                    </div>
+                    <div class="ranking-points">980 pts</div>
+                </div>
+            </section>
+
+            <!-- Espacio para la navegación inferior -->
+            <div class="content-spacer"></div>
+        </main>
+
+        <!-- Navegación inferior -->
+        <nav class="bottom-nav">
+            <div class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Inicio</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-search"></i>
+                <span>Buscar</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-plus-circle"></i>
+                <span>Crear</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-trophy"></i>
+                <span>Ranking</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Perfil</span>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        // Simulación de cambio de pestañas
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remover clase active de todas las pestañas
+                document.querySelectorAll('.nav-tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                
+                // Agregar clase active a la pestaña clickeada
+                this.classList.add('active');
+                
+                // Aquí iría la lógica para mostrar el contenido correspondiente
+            });
+        });
+
+        // Simulación de interacción con botones de acción
+        document.querySelectorAll('.action-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Aquí iría la lógica para unirse a un partido o seguir a un jugador
+                alert('Función activada: ' + this.textContent);
+            });
+        });
+    </script>
+</body>
+</html>
