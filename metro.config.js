@@ -1,0 +1,16 @@
+const { getDefaultConfig } = require('expo/metro-config');
+
+const config = getDefaultConfig(__dirname);
+
+// Configuración para Hermes
+config.resolver.platforms = ['ios', 'android', 'native', 'web'];
+
+// Habilitar Hermes
+config.transformer.minifierConfig = {
+  keep_fnames: true,
+  mangle: {
+    keep_fnames: true,
+  },
+};
+
+module.exports = config;

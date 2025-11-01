@@ -1,9 +1,12 @@
-import React from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { colors, typography, spacing } from '../../styles/global';
+import React from "react";
+import { View, Text, TextInput, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { colors, typography, spacing } from "../../styles/global";
+import  { useNavigation } from "@react-navigation/native";
 
 export default function Header() {
+  const navigation = useNavigation();
+
   return (
     <View style={styles.header}>
       <View style={styles.headerContent}>
@@ -12,8 +15,17 @@ export default function Header() {
           <Text style={styles.logoText}>SportMatch</Text>
         </View>
         <View style={styles.userActions}>
-          <Ionicons name="notifications-outline" size={24} color={colors.white} />
-          <Ionicons name="person-circle-outline" size={24} color={colors.white} />
+          <Ionicons
+            name="notifications-outline"
+            size={24}
+            color={colors.white}
+          />
+          <Ionicons
+            onPress={() => navigation.navigate("Login")}
+            name="person-circle-outline"
+            size={24}
+            color={colors.white}
+          />
         </View>
       </View>
 
@@ -37,33 +49,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
   },
   headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: spacing.md,
   },
   logo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   logoText: {
     color: colors.white,
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginLeft: spacing.xs,
   },
   userActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     width: 60,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
   searchBar: {
     backgroundColor: colors.white,
     borderRadius: 25,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     shadowColor: colors.dark,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
