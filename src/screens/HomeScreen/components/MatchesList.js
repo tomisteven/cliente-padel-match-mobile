@@ -11,7 +11,7 @@ import MatchCard from "../../../components/matches/MatchCard";
 import { colors, typography, spacing } from "../../../styles/global";
 import { useMatches } from "../../../contexts/MatchesContext";
 
-export default function MatchesList({ ubicacionUsuario }) {
+export default function MatchesList({ ubicacionUsuario}) {
   const { matches, refreshMatches } = useMatches();
   //console.log("Matches:", matches);
   const [refreshing, setRefreshing] = useState(false);

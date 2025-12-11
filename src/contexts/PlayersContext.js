@@ -63,9 +63,10 @@ export const PlayersProvider = ({ children }) => {
   const loadPlayers = async () => {
     dispatch({ type: "SET_LOADING", payload: true });
     try {
-      const response = await fetch(`${API_URL}${API_ROUTES.PLAYERS}`, {
+      const response = await fetch(`${API_URL}${API_ROUTES.API}${API_ROUTES.PLAYERS}`, {
         headers: {
           "Content-Type": "application/json",
+          Authorization: `${token}`,
         },
       });
 
@@ -74,7 +75,9 @@ export const PlayersProvider = ({ children }) => {
       }
 
       const players = await response.json();
-      dispatch({ type: "SET_PLAYERS", payload: players.jugadores });
+
+
+      dispatch({ type: "SET_PLAYERS", payload: players });
     } catch (error) {
       console.error("Error loading players:", error);
       dispatch({ type: "SET_ERROR", payload: error.message });
@@ -86,24 +89,24 @@ export const PlayersProvider = ({ children }) => {
     dispatch({ type: "SET_LOADING", payload: true });
 
     try {
-      const response = await fetch(
-        `https://api.sportmatch.com/players/search?q=${encodeURIComponent(
-          query
-        )}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+
+      const response = await fetch(`${API_URL}${API_ROUTES.API}${API_ROUTES.PLAYERS}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${token}`,
+        },
+      });
 
       if (!response.ok) {
-        throw new Error("Error al buscar jugadores");
+        throw new Error("Error al cargar jugadores");
       }
 
       const players = await response.json();
+
       dispatch({ type: "SET_PLAYERS", payload: players });
+      dispatch({ type: "SET_LOADING", payload: false });
+
+
     } catch (error) {
       console.error("Error searching players:", error);
       dispatch({ type: "SET_ERROR", payload: error.message });
@@ -111,12 +114,14 @@ export const PlayersProvider = ({ children }) => {
   };
 
   const getPlayerById = async (playerId) => {
+    console.log(`${API_URL}${API_ROUTES.PLAYER}/${playerId}`);
+
     try {
       const response = await fetch(
-        `https://api.sportmatch.com/players/${playerId}`,
+        `${API_URL}${API_ROUTES.PLAYER}/${playerId}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `${token}`,
             "Content-Type": "application/json",
           },
         }
@@ -126,63 +131,11 @@ export const PlayersProvider = ({ children }) => {
         throw new Error("Error al obtener jugador");
       }
 
-      return await response.json();
+      const data = await response.json();
+      console.log("Jugador obtenido:", data);
+      return data;
     } catch (error) {
       console.error("Error getting player:", error);
-      throw error;
-    }
-  };
-
-  const followPlayer = async (playerId) => {
-    try {
-      const response = await fetch(
-        `https://api.sportmatch.com/players/${playerId}/follow`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Error al seguir jugador");
-      }
-
-      const updatedPlayer = await response.json();
-      dispatch({ type: "UPDATE_PLAYER", payload: updatedPlayer });
-      return updatedPlayer;
-    } catch (error) {
-      console.error("Error following player:", error);
-      dispatch({ type: "SET_ERROR", payload: error.message });
-      throw error;
-    }
-  };
-
-  const unfollowPlayer = async (playerId) => {
-    try {
-      const response = await fetch(
-        `https://api.sportmatch.com/players/${playerId}/unfollow`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Error al dejar de seguir jugador");
-      }
-
-      const updatedPlayer = await response.json();
-      dispatch({ type: "UPDATE_PLAYER", payload: updatedPlayer });
-      return updatedPlayer;
-    } catch (error) {
-      console.error("Error unfollowing player:", error);
-      dispatch({ type: "SET_ERROR", payload: error.message });
       throw error;
     }
   };
@@ -199,8 +152,6 @@ export const PlayersProvider = ({ children }) => {
     ...state,
     searchPlayers,
     getPlayerById,
-    followPlayer,
-    unfollowPlayer,
     setFilters,
     refreshPlayers,
   };

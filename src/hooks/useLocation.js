@@ -47,7 +47,7 @@ export const useLocation = () => {
         return;
       }
 
-      // Obtener ubicación actual
+
       const location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
       });
@@ -58,7 +58,7 @@ export const useLocation = () => {
       });
       setError(null);
 
-      //console.log("Ubicación obtenida:", location);
+     
     } catch (err) {
       console.error("Error obteniendo ubicación:", err);
       setError(err.message);

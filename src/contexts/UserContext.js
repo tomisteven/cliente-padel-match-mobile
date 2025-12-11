@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useReducer, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { API_URL, API_ROUTES } from "../utils/constants";
 
 const UserContext = createContext();
 
 const initialState = {
-  user: null,
-  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwidXNlcl9pZCI6IjY3MTJlMjQzNzc2MzY4NWNhOGFhZGYzYyIsImlhdCI6MTc2MTgzODUyODcxMiwiZXhwIjoxNzY0NTM4NTI4NzEyfQ.uGBw798hZI2UGiTlfJ0OGnUOR9zvm9eEyXsYfcMpUv0",
-  isAuthenticated: true,
+  user: {},
+  token: "",
+  isAuthenticated: false,
   loading: true,
 };
 
@@ -70,9 +71,41 @@ export const UserProvider = ({ children }) => {
     }
   };
 
-  const login = async (userData, token) => {
+  const refreshUserData = async () => {
+    try {
+      const token = await AsyncStorage.getItem("userToken");
+      const getUser = await fetch(`${API_URL}${API_ROUTES.JUGADORES}`, {
+        headers: {
+          Authorization: `${token}`,
+        },
+      });
+
+      const userData = await getUser.json();
+
+      await AsyncStorage.setItem("userData", JSON.stringify(userData));
+
+      dispatch({
+        type: "LOGIN_SUCCESS",
+        payload: { user: userData, token },
+      });
+    } catch (error) {
+      console.error("Error refreshing user data:", error);
+    }
+  };
+
+  const login = async (token) => {
     try {
       await AsyncStorage.setItem("userToken", token);
+      const getUser = await fetch(`${API_URL}${API_ROUTES.JUGADORES}`, {
+        headers: {
+          Authorization: `${token}`,
+        },
+      });
+
+      const userData = await getUser.json();
+
+      //console.log("userData", userData);
+
       await AsyncStorage.setItem("userData", JSON.stringify(userData));
 
       dispatch({
@@ -94,8 +127,157 @@ export const UserProvider = ({ children }) => {
     }
   };
 
-  const updateUser = (userData) => {
-    dispatch({ type: "UPDATE_USER", payload: userData });
+  const updateUser = async (userData) => {
+    try {
+      /* console.log("actualizando usuario");
+      console.log("userData", userData); */
+      const token = await AsyncStorage.getItem("userToken");
+      //console.log("token desde context", token);
+      const response = await fetch(`${API_URL}${API_ROUTES.PLAYER}${API_ROUTES.UPDATE}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${token}`,
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.message || 'Error al actualizar el usuario');
+      }
+
+      const data = await response.json();
+      //console.log("data actualizada", data);
+      await AsyncStorage.setItem('userData', JSON.stringify(data.jugador));
+      dispatch({ type: 'UPDATE_USER', payload: data.jugador });
+    } catch (error) {
+      console.error('Error updating user:', error);
+    }
+
+  };
+
+  const crearPartido = async (partidoData) => {
+    try {
+      const token = await AsyncStorage.getItem("userToken");
+      //console.log("Token desde context", token);
+
+      const response = await fetch(`${API_URL}${API_ROUTES.PLAYER}${API_ROUTES.CREAR_PARTIDO}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${token}`,
+        },
+        body: JSON.stringify(partidoData),
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.message || 'Error al crear el partido');
+      }
+
+      const data = await response.json();
+      //console.log("Partido creado exitosamente:", data);
+
+      if (data.jugador) {
+        await AsyncStorage.setItem('userData', JSON.stringify(data.jugador));
+        dispatch({ type: 'UPDATE_USER', payload: data.jugador });
+      } else {
+        // Si no viene el jugador actualizado, solo logueamos o hacemos un refresh si fuera necesario
+        console.log("Partido creado, pero no se recibió data.jugador para actualizar el contexto.");
+      }
+    } catch (error) {
+      console.error('Error creating partido:', error);
+    }
+  };
+
+  const afiliarJugadorAClub = async ({ clubId }) => {
+    try {
+      const token = await AsyncStorage.getItem("userToken");
+      //console.log(`Afiliando a club: ${clubId}`);
+
+      const response = await fetch(`${API_URL}${API_ROUTES.JUGADORES}${API_ROUTES.AFILIARSE}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${token}`,
+        },
+        body: JSON.stringify({ club_id: clubId }),
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.message || 'Error al afiliarse al club');
+      }
+
+      const data = await response.json();
+      //console.log("Afiliación exitosa:", data);
+
+      // Recargar datos del usuario para actualizar la lista de clubes
+      await loadUserData();
+
+      return data;
+    } catch (error) {
+      console.error('Error en afiliación:', error);
+      throw error;
+    }
+  };
+
+
+  const desafiliarJugador = async ({ clubId }) => {
+    try {
+      const token = await AsyncStorage.getItem("userToken");
+      //console.log(`Desafiliando de club: ${clubId}`);
+
+      const response = await fetch(`${API_URL}${API_ROUTES.JUGADORES}${API_ROUTES.DESAFILIARSE}/${clubId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${token}`,
+        }
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.message || 'Error al desafiliarse del club');
+      }
+
+      const data = await response.json();
+      //console.log("Desafiliación exitosa:", data);
+
+      // Recargar datos del usuario para actualizar la lista de clubes
+      await loadUserData();
+
+      return data;
+    } catch (error) {
+      console.error('Error en desafiliación:', error);
+      throw error;
+    }
+  };
+
+  const register = async ({ nombre, email, password, repeatPassword }) => {
+    try {
+      const response = await fetch(`${API_URL}${API_ROUTES.REGISTER}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nombre, email, password, repeatPassword }),
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.message || 'Error al registrar');
+      }
+
+      const data = await response.json();
+      // Assuming the register endpoint returns token and user data similar to login
+      await login(data.accessToken);
+      return data;
+    } catch (error) {
+      console.error('Error registering user:', error);
+      throw error;
+    }
   };
 
   const value = {
@@ -103,6 +285,12 @@ export const UserProvider = ({ children }) => {
     login,
     logout,
     updateUser,
+    register,
+    afiliarJugadorAClub,
+    desafiliarJugador,
+    loadUserData,
+    refreshUserData,
+    crearPartido,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

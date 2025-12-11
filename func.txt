@@ -1,0 +1,103 @@
+{/* Partidos Activos */}
+        {user?.partidosActivos && user.partidosActivos.length > 0 && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Partidos Activos</Text>
+              <View style={styles.matchCountBadge}>
+                <Text style={styles.matchCountText}>
+                  {user.partidosActivos.length}
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.matchesContainer}>
+              {user.partidosActivos.map((partido, index) => (
+                <View key={partido._id} style={styles.matchCard}>
+                  <View style={styles.matchHeader}>
+                    <View style={styles.matchClubInfo}>
+                      <Ionicons
+                        name="business"
+                        size={16}
+                        color={colors.primary}
+                      />
+                      <Text style={styles.clubName}>{partido.nombreClub}</Text>
+                    </View>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        { backgroundColor: getStatusColor(partido.estado) },
+                      ]}
+                    >
+                      <Text style={styles.statusText}>
+                        {partido.estado?.charAt(0).toUpperCase() +
+                          partido.estado?.slice(1)}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.matchDetails}>
+                    <View style={styles.matchDetailItem}>
+                      <Ionicons name="location" size={14} color={colors.gray} />
+                      <Text style={styles.matchDetailText}>
+                        {partido.localidad || "Ubicación no disponible"}
+                      </Text>
+                    </View>
+
+                    <View style={styles.matchDetailItem}>
+                      <Ionicons name="people" size={14} color={colors.gray} />
+                      <Text style={styles.matchDetailText}>
+                        {partido.jugadores?.length || 0} jugadores
+                      </Text>
+                    </View>
+
+                    <View style={styles.matchDetailItem}>
+                      <Ionicons name="time" size={14} color={colors.gray} />
+                      <Text style={styles.matchDetailText}>
+                        Creado: {formatDateTime(partido.created_at)}
+                      </Text>
+                    </View>
+
+                    {partido.exprire_at && (
+                      <View style={styles.matchDetailItem}>
+                        <Ionicons
+                          name="alert-circle"
+                          size={14}
+                          color={colors.gray}
+                        />
+                        <Text style={styles.matchDetailText}>
+                          Expira: {formatDateTime(partido.exprire_at)}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+
+                  {/* Jugadores del partido */}
+                  {partido.jugadores && partido.jugadores.length > 0 && (
+                    <View style={styles.playersSection}>
+                      <Text style={styles.playersTitle}>Jugadores:</Text>
+                      <View style={styles.playersList}>
+                        {partido.jugadores.map((jugador, idx) => (
+                          <View key={jugador._id} style={styles.playerChip}>
+                            <Ionicons
+                              name="person"
+                              size={12}
+                              color={colors.primary}
+                            />
+                            <Text style={styles.playerName}>
+                              {jugador.nombre}
+                            </Text>
+                            {jugador.jugadorId?._id === user?._id && (
+                              <View style={styles.youBadge}>
+                                <Text style={styles.youText}>Tú</Text>
+                              </View>
+                            )}
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  )}
+                </View>
+              ))}
+            </View>
+          </View>
+        )}

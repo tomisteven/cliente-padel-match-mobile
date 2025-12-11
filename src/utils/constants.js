@@ -1,15 +1,31 @@
-export const API_URL = "https://d23b42a0301a.ngrok-free.app";
+export const API_URL = "https://87c2804b96be.ngrok-free.app";
 
 export const API_ROUTES = {
+  API: "/api/v1",
+  ESTADISTICAS: "/estadisticas",
+  LOCALIDADES: "/localidades",
+  MESSAGES: "/mensajes",
+  MATCH: "/partido",
+  MATCHES: "/partidos",
+  JOIN: "/unirse",
+  AFILIARSE: "/afiliar-jugador",
+  DESAFILIARSE: "/desafiliar-jugador",
+  CREAR_PARTIDO: "/crear-partido",
   CLUBS: "/club",
+  CLUBS_IDS: "/clubes",
+  PLAYER: "/jugador",
   PLAYERS: "/jugadores",
   MATCHES: "/partidos",
-  AUTH: "/auth",
-  USERS: "/user",
+  AUTH: "/auth/login",
+  REGISTER: "/auth/register",
+  UPDATE: "/actualizar",
+  JUGADORES: "/jugador",
   NOTIFICATIONS: "/notification",
   SETTINGS: "/setting",
   FEEDBACK: "/feedback",
   CONTACT: "/contact",
   PRIVACY: "/privacy",
   TERMS: "/terms",
+  LEAVE: "/cancelar/postulacion",
+  SALIR_PARTIDO: "/salir"
 };

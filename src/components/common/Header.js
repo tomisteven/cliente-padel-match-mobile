@@ -2,10 +2,14 @@ import React from "react";
 import { View, Text, TextInput, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors, typography, spacing } from "../../styles/global";
-import  { useNavigation } from "@react-navigation/native";
-
+import { useNavigation } from "@react-navigation/native";
+import { useUser } from "../../contexts/UserContext";
 export default function Header() {
   const navigation = useNavigation();
+
+  const { user } = useUser();
+
+  console.log("user", user);
 
   return (
     <View style={styles.header}>
@@ -21,7 +25,11 @@ export default function Header() {
             color={colors.white}
           />
           <Ionicons
-            onPress={() => navigation.navigate("Login")}
+            onPress={() =>
+              user
+                ? navigation.navigate("Información")
+                : navigation.navigate("Login")
+            }
             name="person-circle-outline"
             size={24}
             color={colors.white}
@@ -29,14 +37,14 @@ export default function Header() {
         </View>
       </View>
 
-      <View style={styles.searchBar}>
+      {/* <View style={styles.searchBar}>
         <Ionicons name="search" size={20} color={colors.gray} />
         <TextInput
           style={styles.searchInput}
           placeholder="Buscar jugadores, partidos, clubes..."
           placeholderTextColor={colors.gray}
         />
-      </View>
+      </View> */}
     </View>
   );
 }
@@ -44,8 +52,8 @@ export default function Header() {
 const styles = StyleSheet.create({
   header: {
     backgroundColor: colors.primary,
-    paddingTop: 50,
-    paddingBottom: spacing.md,
+    paddingTop: 70,
+    paddingBottom: spacing.sm,
     paddingHorizontal: spacing.md,
   },
   headerContent: {

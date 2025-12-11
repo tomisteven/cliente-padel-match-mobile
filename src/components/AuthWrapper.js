@@ -4,6 +4,7 @@ import { useUser } from '../contexts/UserContext';
 import LoginScreen from '../screens/LoginScreen';
 import AppNavigator from '../navigation/AppNavigator';
 import { colors, typography, spacing } from '../styles/global';
+import NotificationBar from './common/NotificationBar';
 
 export default function AuthWrapper() {
   const { isAuthenticated, loading } = useUser();
@@ -21,7 +22,12 @@ export default function AuthWrapper() {
     return <LoginScreen />;
   }
 
-  return <AppNavigator />;
+  return (
+    <>
+      <AppNavigator />
+      <NotificationBar />
+    </>
+  );
 }
 
 const styles = StyleSheet.create({

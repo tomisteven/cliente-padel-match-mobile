@@ -1,12 +1,17 @@
 export const colors = {
   primary: '#4CAF50',
   primaryDark: '#388E3C',
+  primaryLight: '#ff9742ff',
   secondary: '#2196F3',
-  accent: '#FF5722',
+  celeste: '#8bcbffff',
+  orange: '#ff9e15ff',
+  accent: '#e09825ff',
   light: '#f8f9fa',
   dark: '#212529',
   gray: '#6c757d',
+  purple: '#a962f5ff',
   white: '#ffffff',
+  red: '#f44336',
   cardShadow: 'rgba(0,0,0,0.1)',
 };
 

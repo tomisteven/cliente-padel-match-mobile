@@ -18,6 +18,8 @@ export default function MatchCard({ match, onJoin, onLike, onShare }) {
     created_at,
   } = match;
 
+  console.log("match", match);
+
   const { ubicacion } = useLocation();
 
   const ubicacionUsuarioLat = ubicacion?.latitude;
@@ -97,7 +99,7 @@ export default function MatchCard({ match, onJoin, onLike, onShare }) {
             </Text>
 
             <Text style={styles.matchSubtitle}>
-             {formatearFecha(exprire_at)}
+              {formatearFecha(exprire_at)}
             </Text>
           </View>
         </View>

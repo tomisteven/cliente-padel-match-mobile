@@ -27,7 +27,7 @@ const matchesReducer = (state, action) => {
       return {
         ...state,
         matches: state.matches.map((match) =>
-          match.id === action.payload.id
+          match._id === action.payload._id
             ? { ...match, ...action.payload }
             : match
         ),
@@ -50,12 +50,45 @@ export const MatchesProvider = ({ children }) => {
   const [state, dispatch] = useReducer(matchesReducer, initialState);
   const { token } = useUser();
 
-  console.log("Token:", token);
+  //console.log("Token:", token);
 
   // Cargar partidos al iniciar
   useEffect(() => {
     loadMatches();
   }, []);
+
+  const enviarMensajeMatch = async (matchId, mensaje) => {
+    try {
+      //console.log(`${API_URL}${API_ROUTES.MESSAGES}${API_ROUTES.MATCH}/${matchId}`);
+      const response = await fetch(
+        `${API_URL}${API_ROUTES.MESSAGES}${API_ROUTES.MATCH}/${matchId}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ mensaje }),
+        }
+      );
+
+      /* if (!response.ok) {
+        throw new Error("Error al enviar mensaje");
+      } */
+
+
+
+      const data = await response.json();
+
+      dispatch({ type: "UPDATE_MATCH", payload: { id: matchId, mensajes: [...state.matches.find((match) => match._id === matchId).mensajes, data.mensaje] } });
+
+      //console.log("Mensaje enviado:", data);
+      return data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  };
 
   const loadMatches = async () => {
     dispatch({ type: "SET_LOADING", payload: true });
@@ -72,7 +105,7 @@ export const MatchesProvider = ({ children }) => {
 
       const matches = await response.json();
 
-      console.log("Matches:", matches);
+      //console.log("Matches:", matches);
 
       dispatch({ type: "SET_MATCHES", payload: matches.partidos });
     } catch (error) {
@@ -109,22 +142,19 @@ export const MatchesProvider = ({ children }) => {
   const joinMatch = async (matchId) => {
     try {
       const response = await fetch(
-        `https://api.sportmatch.com/matches/${matchId}/join`,
+        `${API_URL}${API_ROUTES.PLAYER}${API_ROUTES.JOIN}/${matchId}`,
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `${token}`,
             "Content-Type": "application/json",
           },
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Error al unirse al partido");
-      }
-
       const updatedMatch = await response.json();
-      dispatch({ type: "UPDATE_MATCH", payload: updatedMatch });
+      loadMatches();
+
       return updatedMatch;
     } catch (error) {
       console.error("Error joining match:", error);
@@ -135,12 +165,13 @@ export const MatchesProvider = ({ children }) => {
 
   const leaveMatch = async (matchId) => {
     try {
+      console.log("Leave match:", matchId);
       const response = await fetch(
-        `https://api.sportmatch.com/matches/${matchId}/leave`,
+        `${API_URL}${API_ROUTES.PLAYER}${API_ROUTES.SALIR_PARTIDO}/${matchId}`,
         {
-          method: "POST",
+          method: "PATCH",
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `${token}`,
             "Content-Type": "application/json",
           },
         }
@@ -160,12 +191,68 @@ export const MatchesProvider = ({ children }) => {
     }
   };
 
+  const editMatch = async (matchId, matchData) => {
+    try {
+      //console.log('Editando partido:', matchId, matchData);
+
+      const response = await fetch(
+        `${API_URL}${API_ROUTES.MATCHES}/${matchId}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(matchData),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Error al editar partido");
+      }
+
+      const updatedMatch = await response.json();
+      //console.log('Partido actualizado desde API:', updatedMatch);
+
+      // Recargar todos los partidos para asegurar sincronización
+      await loadMatches();
+
+      return updatedMatch;
+    } catch (error) {
+      console.error("Error editing match:", error);
+      dispatch({ type: "SET_ERROR", payload: error.message });
+      throw error;
+    }
+  };
+
   const setFilters = (filters) => {
     dispatch({ type: "SET_FILTERS", payload: filters });
   };
 
   const refreshMatches = () => {
     loadMatches();
+  };
+
+  const filterMatches = async (queryParams) => {
+    try {
+      const queryString = new URLSearchParams(queryParams).toString();
+      const response = await fetch(`${API_URL}${API_ROUTES.MATCHES}?${queryString}`, {
+        headers: {
+          Authorization: `${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al filtrar partidos");
+      }
+
+      const data = await response.json();
+      return data.partidos || data; // Adaptar según la respuesta del back
+    } catch (error) {
+      console.error("Error filtering matches:", error);
+      throw error;
+    }
   };
 
   const value = {
@@ -175,6 +262,9 @@ export const MatchesProvider = ({ children }) => {
     leaveMatch,
     setFilters,
     refreshMatches,
+    filterMatches,
+    enviarMensajeMatch,
+    editMatch
   };
 
   return (

@@ -53,12 +53,12 @@ export const ClubsProvider = ({ children }) => {
 
   // Cargar clubes al iniciar
   useEffect(() => {
-    console.log("cargando clubes al iniciar");
+    //console.log("cargando clubes al iniciar");
     loadClubs();
   }, []);
 
   const loadClubs = async () => {
-    console.log("cargando clubes");
+    //console.log("cargando clubes");
     dispatch({ type: "SET_LOADING", payload: true });
 
     try {
@@ -67,16 +67,14 @@ export const ClubsProvider = ({ children }) => {
         headers: {
           "Content-Type": "application/json",
           // Si tu API requiere autenticación, descomenta esto:
-          // Authorization: `Bearer ${token}`,
+          Authorization: `${token}`,
         },
       });
 
-      if (!response.ok) {
-        throw new Error(`Error al cargar clubes: ${response.status}`);
-      }
+
 
       const clubs = await response.json();
-      console.log("clubes cargados:", clubs); // ✅ Para debugging
+      //console.log("clubes cargados:", clubs); // ✅ Para debugging
       dispatch({ type: "SET_CLUBS", payload: clubs });
 
     } catch (error) {
@@ -94,7 +92,7 @@ export const ClubsProvider = ({ children }) => {
         `${API_URL}${API_ROUTES.CLUBS}?q=${query}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `${token}`,
             "Content-Type": "application/json",
           },
         }
@@ -118,7 +116,7 @@ export const ClubsProvider = ({ children }) => {
         `${API_URL}${API_ROUTES.CLUBS}/${clubId}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `${token}`,
             "Content-Type": "application/json",
           },
         }
@@ -142,7 +140,7 @@ export const ClubsProvider = ({ children }) => {
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `${token}`,
             "Content-Type": "application/json",
           },
         }
@@ -169,7 +167,7 @@ export const ClubsProvider = ({ children }) => {
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `${token}`,
             "Content-Type": "application/json",
           },
         }
@@ -196,7 +194,7 @@ export const ClubsProvider = ({ children }) => {
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ rating }),
